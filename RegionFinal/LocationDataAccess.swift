@@ -20,6 +20,15 @@ class LocationDataAccess: NSObject {
             return
         }
         
+        if let lastInsertedLocation = getLastInsertedUserLocation() {
+            
+            if (lastInsertedLocation.isEqualToCoreLocation(userLocation)) {
+                
+                return
+            }
+            
+        }
+        
         let manageOBC = appDelegate.persistentContainer.viewContext
         let entity = NSEntityDescription.entity(forEntityName: "Location", in: manageOBC)
         let location = NSManagedObject(entity: entity!, insertInto: manageOBC)

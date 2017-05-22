@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CoreLocation
 
 
 extension Location {
@@ -20,5 +21,17 @@ extension Location {
     @NSManaged public var longitude: Double
     @NSManaged public var timestamp: NSDate?
     @NSManaged public var humanreadable: String?
+    
+    func isEqualToCoreLocation(_ location : CLLocation) -> Bool{
+        
+        var isEqual : Bool = false
+        
+        if(location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) < 100 ) {
+            isEqual = true
+        }
+        
+        
+        return isEqual
+    }
 
 }
