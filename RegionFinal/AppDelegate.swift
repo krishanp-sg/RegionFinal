@@ -17,13 +17,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
+        let locationManger = LocationManager.sharedManager
         if let launchOptions = launchOptions {
             for (key,_) in launchOptions {
                 CommonHelper.writeToFile("Launch options key : \(key) ")
+                locationManger.isAppLaunchedFromLocationKey = true
             }
         }
         
-        let locationManger = LocationManager.sharedManager
+        
         locationManger.setupLocationManager()
         
         return true

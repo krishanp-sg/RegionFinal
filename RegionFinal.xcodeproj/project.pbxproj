@@ -48,6 +48,7 @@
 		6A1AC3711ED2E9EE0046A350 /* BackgroundTaskManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundTaskManager.h; sourceTree = "<group>"; };
 		6A1AC3721ED2E9EE0046A350 /* BackgroundTaskManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundTaskManager.m; sourceTree = "<group>"; };
 		6A1AC3741ED2EA2A0046A350 /* LocationShareModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationShareModel.swift; sourceTree = "<group>"; };
+		6A726FDE1EEE718100AD4414 /* SamsungHubToYishun.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SamsungHubToYishun.gpx; sourceTree = "<group>"; };
 		6AF5CCE51ED27CFF00B876BE /* RegionFinal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RegionFinal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AF5CCE81ED27CFF00B876BE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6AF5CCEA1ED27CFF00B876BE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -171,6 +172,7 @@
 			children = (
 				6AF5CCEA1ED27CFF00B876BE /* ViewController.swift */,
 				6AF5CD301ED2CC7200B876BE /* SamsungHub.gpx */,
+				6A726FDE1EEE718100AD4414 /* SamsungHubToYishun.gpx */,
 				6AF5CD311ED2CC7E00B876BE /* Hougnag.gpx */,
 			);
 			name = ViewController;
@@ -482,7 +484,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -525,7 +527,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

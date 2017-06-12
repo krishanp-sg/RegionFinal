@@ -33,5 +33,16 @@ extension Location {
         
         return isEqual
     }
+    
+    func isIdleUserLocation(_ location : CLLocation) -> Bool {
+        
+        // If location distance less than 100m and Time is greater than 5 minutes , assume user is in idle state
+        if( isEqualToCoreLocation(location) && location.timestamp.timeIntervalSince(self.timestamp! as Date) > 5*60){
+            CommonHelper.writeToFile("User In Idle State ")
+            return true
+        }
+        
+        return false
+    }
 
 }

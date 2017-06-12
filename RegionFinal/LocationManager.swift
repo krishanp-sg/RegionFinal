@@ -11,27 +11,35 @@ import CoreLocation
 
 class LocationManager: NSObject {
     
+    let distanceFilter = 50.0
+    
     static let sharedManager = LocationManager()
     var locationManager : CLLocationManager?
     var isAppInforeground : Bool = false
     var locationShareModel = LocationShareModel.sharedInstance
+    var isAppLaunchedFromLocationKey = false
+    var isUserInIdleState = false
+    
+    
+    var userLastLocation : CLLocation?
     
     func setupLocationManager(){
         self.locationManager = CLLocationManager()
         self.locationManager?.delegate = self
         self.locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+        self.locationManager!.distanceFilter = distanceFilter
         self.locationManager?.requestAlwaysAuthorization()
         self.locationManager?.startUpdatingLocation()
         
-        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
-            
-            let samsungHubRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.283577, longitude: 103.849670), radius: 100, identifier: "SamsungHub")
-            
-            let hougang = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.372576, longitude: 103.888259), radius: 100, identifier: "hougnag")
-            
-            self.locationManager!.startMonitoring(for: samsungHubRegion)
-            self.locationManager!.startMonitoring(for: hougang)
-        }
+//        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
+//            
+//            let samsungHubRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.283577, longitude: 103.849670), radius: 10, identifier: "SamsungHub")
+//            
+//            let hougang = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.372576, longitude: 103.888259), radius: 10, identifier: "hougnag")
+//            
+//            self.locationManager!.startMonitoring(for: samsungHubRegion)
+//            self.locationManager!.startMonitoring(for: hougang)
+//        }
     }
     
     required override init(){
@@ -51,6 +59,20 @@ class LocationManager: NSObject {
          notificationCenter.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
         
          self.locationShareModel.bagTaskManager = BackgroundTaskManager.shared()
+         self.locationShareModel.bagTaskManager!.delegate = self
+    }
+    
+    func stopTimers(){
+        
+        if self.locationShareModel.backgroundTimer != nil {
+            self.locationShareModel.backgroundTimer?.invalidate()
+            self.locationShareModel.backgroundTimer = nil
+        }
+        
+        if self.locationShareModel.stopLocationManagerAfter10sTimer != nil {
+            self.locationShareModel.stopLocationManagerAfter10sTimer?.invalidate()
+            self.locationShareModel.stopLocationManagerAfter10sTimer = nil
+        }
     }
     
     
@@ -67,17 +89,8 @@ class LocationManager: NSObject {
     func appMovedToForeground(){
         isAppInforeground = true
         CommonHelper.writeToFile("App Moved To Foreground ")
-        
-        if self.locationShareModel.backgroundTimer != nil {
-            self.locationShareModel.backgroundTimer?.invalidate()
-            self.locationShareModel.backgroundTimer = nil
-        }
-        
-        if self.locationShareModel.stopLocationManagerAfter10sTimer != nil {
-            self.locationShareModel.stopLocationManagerAfter10sTimer?.invalidate()
-            self.locationShareModel.stopLocationManagerAfter10sTimer = nil
-        }
-        
+        stopDynamicRegions()
+        stopTimers()
         self.locationManager!.startUpdatingLocation()
     }
     
@@ -94,19 +107,47 @@ class LocationManager: NSObject {
             self.locationShareModel.backgroundTimer?.invalidate()
             self.locationShareModel.backgroundTimer = nil
         }
-        self.locationManager!.stopUpdatingLocation()
+//        self.locationManager!.stopUpdatingLocation()
         self.locationManager?.startUpdatingLocation()
         CommonHelper.writeToFile("Restarting Location Manager ")
     }
     
     func stopLocationManager(){
-        self.locationManager?.stopUpdatingLocation()
+        self.locationManager!.stopUpdatingLocation()
         CommonHelper.writeToFile("Location Manager Stopped ")
+    }
+    
+    func stopDynamicRegions(){
+        for region in self.locationManager!.monitoredRegions {
+                self.locationManager?.stopMonitoring(for: region)
+        }
+    }
+    
+    func createDynamicRegionToMonitor(){
+        
+        self.locationShareModel.bagTaskManager!.beginNewBackgroundTask()
+        
+        stopTimers()
+        stopDynamicRegions()
+        stopLocationManager()
+        
+        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
+            
+            if let lastUserLocation = self.userLastLocation {
+                  CommonHelper.writeToFile("Creating dynamic region To Monitor Coordinate : \(lastUserLocation.coordinate.latitude),\(lastUserLocation.coordinate.longitude)")
+                
+                let dynamicRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lastUserLocation.coordinate.latitude, longitude: lastUserLocation.coordinate.longitude), radius: 50, identifier: "dynamicRegion")
+        
+                self.locationManager!.startMonitoring(for: dynamicRegion)
+            }
+            
+            
+        }
     }
 
 }
 
-extension LocationManager : CLLocationManagerDelegate {
+extension LocationManager : CLLocationManagerDelegate, BackgroundMansterTaskExpireDelagte {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         CommonHelper.writeToFile("Location Manager Did Fail With Error : \(error.localizedDescription) ")
@@ -115,12 +156,17 @@ extension LocationManager : CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        CommonHelper.writeToFile("Location Manager Did Update Location: \(locations.last!.coordinate.latitude),\(locations.last!.coordinate.longitude) ")
-        LocationDataAccess.insertLocationToDataBase(userLocation: locations.last!)
         
+        self.userLastLocation = locations.last!
+        LocationDataAccess.insertLocationToDataBase(userLocation: locations.last!)
         
         if (!isAppInforeground){
             CommonHelper.writeToFile("App Is In The Background")
+            
+//            if(CommonHelper.checkIfUserInIdleState(userLastLocation: locations.last!)){
+//                createDynamicRegionToMonitor()
+//                return
+//            }
             
             if locationShareModel.backgroundTimer != nil{
                 return
@@ -154,6 +200,13 @@ extension LocationManager : CLLocationManagerDelegate {
     }
     
     
+    func masterTaskExpired() {
+        // Master task expired , restart the background Task
+        CommonHelper.writeToFile("Master Task Expired, Called Location Manager Master task expired delegate ")
+
+        createDynamicRegionToMonitor()
+
+    }
     
 
 }

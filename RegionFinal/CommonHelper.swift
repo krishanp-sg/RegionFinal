@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class CommonHelper: NSObject {
     static let file : String = "log.txt"
@@ -38,6 +39,20 @@ class CommonHelper: NSObject {
 
     }
     
+    
+    static func checkIfUserInIdleState(userLastLocation : CLLocation) -> Bool{
+               
+        if let lastInsertedLocation = LocationDataAccess.getLastInsertedUserLocation() {
+            
+            if (lastInsertedLocation.isIdleUserLocation(userLastLocation)) {
+                
+                return true
+            }
+        }
+
+        return false
+    }
+
 }
 
 extension String {
