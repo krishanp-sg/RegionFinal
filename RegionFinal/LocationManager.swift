@@ -19,6 +19,7 @@ class LocationManager: NSObject {
     var locationShareModel = LocationShareModel.sharedInstance
     var isAppLaunchedFromLocationKey = false
     var isUserInIdleState = false
+    var isUserIdleRegionToMonitorCreated = false
     
     
     var userLastLocation : CLLocation?
@@ -27,19 +28,11 @@ class LocationManager: NSObject {
         self.locationManager = CLLocationManager()
         self.locationManager?.delegate = self
         self.locationManager?.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager!.distanceFilter = distanceFilter
+        self.locationManager!.allowsBackgroundLocationUpdates = true
         self.locationManager?.requestAlwaysAuthorization()
         self.locationManager?.startUpdatingLocation()
         
-//        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
-//            
-//            let samsungHubRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.283577, longitude: 103.849670), radius: 10, identifier: "SamsungHub")
-//            
-//            let hougang = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.372576, longitude: 103.888259), radius: 10, identifier: "hougnag")
-//            
-//            self.locationManager!.startMonitoring(for: samsungHubRegion)
-//            self.locationManager!.startMonitoring(for: hougang)
-//        }
+        stopDynamicRegions()
     }
     
     required override init(){
@@ -107,7 +100,7 @@ class LocationManager: NSObject {
             self.locationShareModel.backgroundTimer?.invalidate()
             self.locationShareModel.backgroundTimer = nil
         }
-//        self.locationManager!.stopUpdatingLocation()
+        self.locationManager!.stopUpdatingLocation()
         self.locationManager?.startUpdatingLocation()
         CommonHelper.writeToFile("Restarting Location Manager ")
     }
@@ -118,31 +111,38 @@ class LocationManager: NSObject {
     }
     
     func stopDynamicRegions(){
+         isUserIdleRegionToMonitorCreated = false
         for region in self.locationManager!.monitoredRegions {
+                CommonHelper.writeToFile("Stopping Monitoring Regions For : \(region.identifier)")
                 self.locationManager?.stopMonitoring(for: region)
         }
     }
     
     func createDynamicRegionToMonitor(){
-        
-        self.locationShareModel.bagTaskManager!.beginNewBackgroundTask()
-        
         stopTimers()
         stopDynamicRegions()
         stopLocationManager()
+//        setupLocationManager()
         
         if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
             
             if let lastUserLocation = self.userLastLocation {
-                  CommonHelper.writeToFile("Creating dynamic region To Monitor Coordinate : \(lastUserLocation.coordinate.latitude),\(lastUserLocation.coordinate.longitude)")
                 
-                let dynamicRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lastUserLocation.coordinate.latitude, longitude: lastUserLocation.coordinate.longitude), radius: 50, identifier: "dynamicRegion")
-        
+                
+                let dynamicRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lastUserLocation.coordinate.latitude, longitude: lastUserLocation.coordinate.longitude), radius: 50, identifier: "dynamicRegion \(lastUserLocation.coordinate.latitude) \(lastUserLocation.coordinate.longitude) ")
+                
+                setupLocationManager()
                 self.locationManager!.startMonitoring(for: dynamicRegion)
+                
+                CommonHelper.writeToFile("Creating dynamic region To Monitor Coordinate : \(lastUserLocation.coordinate.latitude),\(lastUserLocation.coordinate.longitude) ")
+  
             }
             
-            
         }
+        
+        self.locationShareModel.bagTaskManager?.endAllBackgroundTasks()
+        CommonHelper.writeToFile("Dynamic Region creations, end all background task ")
+        
     }
 
 }
@@ -157,16 +157,23 @@ extension LocationManager : CLLocationManagerDelegate, BackgroundMansterTaskExpi
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
+        if isUserIdleRegionToMonitorCreated {
+            return
+        }
+        
         self.userLastLocation = locations.last!
         LocationDataAccess.insertLocationToDataBase(userLocation: locations.last!)
         
         if (!isAppInforeground){
             CommonHelper.writeToFile("App Is In The Background")
             
-//            if(CommonHelper.checkIfUserInIdleState(userLastLocation: locations.last!)){
-//                createDynamicRegionToMonitor()
-//                return
-//            }
+            if(CommonHelper.checkIfUserInIdleState(userLastLocation: locations.last!) && !isUserIdleRegionToMonitorCreated){
+                self.locationShareModel.bagTaskManager!.beginNewBackgroundTask()
+                CommonHelper.writeToFile("User is idle, creating dynamic region to monitor ")
+                createDynamicRegionToMonitor()
+                isUserIdleRegionToMonitorCreated = true
+                return
+            }
             
             if locationShareModel.backgroundTimer != nil{
                 return
@@ -191,16 +198,20 @@ extension LocationManager : CLLocationManagerDelegate, BackgroundMansterTaskExpi
     
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         CommonHelper.writeToFile("Location Manager Did Enter Region : \(region.identifier) ")
+        stopDynamicRegions()
         restartLocationUpdate()
     }
     
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
         CommonHelper.writeToFile("Location Manager Did Exit Region : \(region.identifier) ")
+        stopDynamicRegions()
         restartLocationUpdate()
     }
     
     
     func masterTaskExpired() {
+        self.locationShareModel.bagTaskManager!.beginNewBackgroundTask()
+        
         // Master task expired , restart the background Task
         CommonHelper.writeToFile("Master Task Expired, Called Location Manager Master task expired delegate ")
 

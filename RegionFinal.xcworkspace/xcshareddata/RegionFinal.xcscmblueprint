@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "FB7BC854A11C02B56DBE004EE63ADDC907C93789",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "FB7BC854A11C02B56DBE004EE63ADDC907C93789" : 9223372036854775807,
+    "D1EEEA3EA3AE1630953BC7F7D966EBE5F65997F9" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "00A34C3E-EE87-4CB5-AFF8-DEA6C65EBA88",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "FB7BC854A11C02B56DBE004EE63ADDC907C93789" : "RegionFinal\/",
+    "D1EEEA3EA3AE1630953BC7F7D966EBE5F65997F9" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "RegionFinal",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "RegionFinal.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/krishanp-sg\/PixErf-Insta-Assignment.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D1EEEA3EA3AE1630953BC7F7D966EBE5F65997F9"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/krishanp-sg\/RegionFinal.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "FB7BC854A11C02B56DBE004EE63ADDC907C93789"
+    }
+  ]
+}

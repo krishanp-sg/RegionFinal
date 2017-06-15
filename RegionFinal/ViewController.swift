@@ -21,16 +21,15 @@ class ViewController: UIViewController {
         let fetchRequest : NSFetchRequest<Location> = Location.fetchRequest()
         fetchRequest.sortDescriptors = [ NSSortDescriptor.init(key: "timestamp", ascending: false) ]
         
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        let manageOBC = appDelegate?.persistentContainer.viewContext
+//        
+//        let fetchedResultsController = NSFetchedResultsController.init(fetchRequest: fetchRequest, managedObjectContext: manageOBC!, sectionNameKeyPath: nil, cacheName: nil)
         
-        let fetchedResultsController = NSFetchedResultsController.init(fetchRequest: fetchRequest, managedObjectContext: manageOBC!, sectionNameKeyPath: nil, cacheName: nil)
+        let frc = NSFetchedResultsController (fetchRequest: fetchRequest, managedObjectContext: LocationDataAccess.getMainContext(), sectionNameKeyPath: nil, cacheName: nil)
+        frc.delegate = self
+
         
         
-        fetchedResultsController.delegate = self
-        
-        
-        return fetchedResultsController as! NSFetchedResultsController<NSFetchRequestResult>
+        return frc as! NSFetchedResultsController<NSFetchRequestResult>
     }()
     
 
@@ -64,6 +63,9 @@ class ViewController: UIViewController {
     }
 
 
+    @IBAction func sendLocationsToServer(_ sender: Any) {
+        UploadLocations.sharedLocation.sendLocationBackToServer()
+    }
 }
 
 extension ViewController : UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate {
@@ -106,6 +108,10 @@ extension ViewController : UITableViewDataSource, UITableViewDelegate, NSFetched
                 self.locationsTableView.insertRows(at: [indexPath], with: .fade)
             }
             break;
+        case .delete:
+            if let indexPath = indexPath {
+                self.locationsTableView.deleteRows(at: [indexPath], with: .fade)
+            }
         default:
             print("...")
         }

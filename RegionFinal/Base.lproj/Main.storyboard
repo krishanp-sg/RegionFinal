@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -36,12 +36,29 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1gs-E3-uFk">
+                                <rect key="frame" x="16" y="19" width="95" height="30"/>
+                                <color key="backgroundColor" red="0.66666666669999997" green="0.66666666669999997" blue="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="95" id="DK3-eB-MwD"/>
+                                    <constraint firstAttribute="height" constant="30" id="ykx-LR-GDC"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Arial-BoldMT" family="Arial" pointSize="21"/>
+                                <state key="normal" title="Send">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendLocationsToServer:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hQx-zS-Ys2"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.47843137250000001" green="0.67843137249999996" blue="0.90588235289999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="Ukn-IY-1ry" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="08Y-G0-Da4"/>
                             <constraint firstItem="Ukn-IY-1ry" firstAttribute="top" secondItem="Saq-6h-3Bx" secondAttribute="bottom" constant="15" id="A8l-54-Sap"/>
                             <constraint firstAttribute="trailing" secondItem="Ukn-IY-1ry" secondAttribute="trailing" id="CGQ-Bv-k5c"/>
+                            <constraint firstItem="Ukn-IY-1ry" firstAttribute="top" secondItem="1gs-E3-uFk" secondAttribute="bottom" constant="15" id="O7H-sA-MIq"/>
+                            <constraint firstItem="1gs-E3-uFk" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Y3K-M8-pxL"/>
                             <constraint firstItem="Saq-6h-3Bx" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="fr9-B4-uoQ"/>
                             <constraint firstItem="Ukn-IY-1ry" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="44" id="mCq-Ip-DD7"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Ukn-IY-1ry" secondAttribute="bottom" id="nXC-hM-Rer"/>
@@ -54,6 +71,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="136.80000000000001" y="138.98050974512745"/>
         </scene>
     </scenes>
 </document>

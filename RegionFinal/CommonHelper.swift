@@ -52,6 +52,34 @@ class CommonHelper: NSObject {
 
         return false
     }
+    
+    static func getCurrentDate() -> Date {
+        
+        let date = Date()
+        let newDate = getCurrentDate(date: date)
+        
+        return newDate
+    }
+    
+    static func getCurrentDate(date:Date) -> Date {
+        
+        let timeZone = TimeZone.current
+        let seconds =  timeZone.secondsFromGMT(for: date)
+        let newDate = Date(timeInterval: TimeInterval(seconds), since: date)
+        
+        return newDate
+    }
+    
+    static func getGMTModifiedDate(date:Date) -> Date{
+        let dateFormater = DateFormatter()
+        dateFormater.dateFormat = "yyyy-MM-dd"
+        dateFormater.timeZone = TimeZone(secondsFromGMT: 0)
+        let dateString = dateFormater.string(from: date)
+        
+        let newDate =  NSCalendar.current.startOfDay(for: dateFormater.date(from: dateString)!)
+        return getCurrentDate(date: newDate)
+    }
+
 
 }
 

@@ -9,38 +9,6 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "RegionFinal/LocationManager.swift"
-            timestampString = "518953403.554944"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "101"
-            endingLineNumber = "101"
-            landmarkName = "LocationManager"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "RegionFinal/LocationManager.swift"
-            timestampString = "518953403.554944"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "113"
-            endingLineNumber = "113"
-            landmarkName = "restartLocationUpdate()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "RegionFinal/CommonHelper.swift"
             timestampString = "518949637.124516"
             startingColumnNumber = "9223372036854775807"
@@ -57,13 +25,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "RegionFinal/LocationManager.swift"
-            timestampString = "518953403.554944"
+            filePath = "Location+CoreDataProperties.swift"
+            timestampString = "519030439.966876"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
-            landmarkName = "locationManager(_:didUpdateLocations:)"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
+            landmarkName = "isIdleUserLocation(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -73,13 +41,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Location+CoreDataProperties.swift"
-            timestampString = "518949658.184861"
+            filePath = "RegionFinal/BackgroundTaskManager.m"
+            timestampString = "519018987.371978"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "41"
-            endingLineNumber = "41"
-            landmarkName = "isIdleUserLocation(_:)"
+            startingLineNumber = "48"
+            endingLineNumber = "48"
+            landmarkName = "-beginNewBackgroundTask"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

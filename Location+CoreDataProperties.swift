@@ -24,9 +24,12 @@ extension Location {
     
     func isEqualToCoreLocation(_ location : CLLocation) -> Bool{
         
+//        CommonHelper.writeToFile("isEqualToCoreLocation : Exisiting Coordinate \(latitude),\(longitude) , New Location To Insert \(location.coordinate.latitude),\(location.coordinate.longitude) , Distance Between Two locations \(location.distance(from: CLLocation(latitude: latitude, longitude: longitude))) ")
+        
         var isEqual : Bool = false
         
-        if(location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) < 100 ) {
+        if(location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) < 50 ) {
+      
             isEqual = true
         }
         
