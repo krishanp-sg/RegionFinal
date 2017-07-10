@@ -23,13 +23,13 @@ class LocationManagerNew: NSObject {
     var isAppLaunchedFromLocationKey = false
     var isLocationUpdating = false
     var isUserIdleRegionToMonitorCreated = false
-    
+    var tempLocations : [TemperaryLocation] = [TemperaryLocation]()
     var userLastLocation : CLLocation?
     
     func setupLocationManager(){
         self.locationManager = CLLocationManager()
         self.locationManager?.delegate = self
-        self.locationManager?.desiredAccuracy = kCLLocationAccuracyKilometer
+        self.locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
         self.locationManager!.allowsBackgroundLocationUpdates = true
         self.locationManager?.requestAlwaysAuthorization()
         self.locationManager?.startUpdatingLocation()
@@ -37,16 +37,6 @@ class LocationManagerNew: NSObject {
         if isAppLaunchedFromLocationKey {
             setupSignificantLocationManagerUpdate()
         }
-        
-//        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
-//        
-//            let samsungHubRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.283577, longitude: 103.849670), radius: 10, identifier: samsungHubIdentifier)
-//        
-//            let hougang = CLCircularRegion(center: CLLocationCoordinate2D(latitude: 1.372576, longitude: 103.888259), radius: 10, identifier: hounganIdentifier)
-//        
-//            self.locationManager!.startMonitoring(for: samsungHubRegion)
-//            self.locationManager!.startMonitoring(for: hougang)
-//        }
     }
     
     required override init(){
@@ -159,13 +149,13 @@ class LocationManagerNew: NSObject {
     func createDynamicRegionToMonitor(){
         stopTimers()
         stopDynamicRegions()
-        
+        self.tempLocations.removeAll()
         if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
             
             if let lastUserLocation = self.userLastLocation {
                 
                 
-                let dynamicRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lastUserLocation.coordinate.latitude, longitude: lastUserLocation.coordinate.longitude), radius: 10, identifier: "dynamicRegion \(lastUserLocation.coordinate.latitude) \(lastUserLocation.coordinate.longitude) ")
+                let dynamicRegion = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lastUserLocation.coordinate.latitude, longitude: lastUserLocation.coordinate.longitude), radius: 150, identifier: "dynamicRegion \(lastUserLocation.coordinate.latitude) \(lastUserLocation.coordinate.longitude) ")
                 
                 self.locationManager!.startMonitoring(for: dynamicRegion)
                 stopLocationManager()
@@ -189,6 +179,29 @@ class LocationManagerNew: NSObject {
             self.significantLocationManager = nil
         }
     }
+    
+    
+    struct TemperaryLocation {
+        let location : CLLocation!
+        let date : Date!
+        
+        init(location : CLLocation, date : Date ) {
+            self.location = location
+            self.date = date
+        }
+    }
+    
+    func addTemperoryLocation(location : CLLocation) {
+        
+        if self.tempLocations.count == 0 {
+            self.tempLocations.append(TemperaryLocation(location: location, date: Date()))
+            return
+        }
+        
+//        self.tempLocations = self.tempLocations.filter({Date().timeIntervalSince($0.date!) < 5*60})
+        self.tempLocations.append(TemperaryLocation(location: location, date: Date()))
+
+    }
 
 
 }
@@ -197,31 +210,45 @@ extension LocationManagerNew : CLLocationManagerDelegate, BackgroundMansterTaskE
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         CommonHelper.writeToFile("Location Manager Did Fail With Error : \(error.localizedDescription) ")
-        
-        
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        
         
         if isLocationUpdating || isUserIdleRegionToMonitorCreated {
             return
         }
         self.userLastLocation = locations.last
         isLocationUpdating = true
-        CommonHelper.writeToFile("Location Manager Did Update Location: \(locations.last!.coordinate.latitude),\(locations.last!.coordinate.longitude)  \(manager == self.locationManager ? "Location Manager":"Significant") ")
-        LocationDataAccess.insertLocationToDataBase(userLocation: locations.last!)
+        if LocationDataAccess.insertLocationToDataBase(userLocation: locations.last!) {
+            addTemperoryLocation(location: locations.last!)
+            CommonHelper.writeToFile("Location Manager : \(manager == self.significantLocationManager ? "Significant Manager " : "Default Location Manager ")")
+        }
+        
         isLocationUpdating = false
         
         if (!isAppInforeground){
-            CommonHelper.writeToFile("App Is In The Background")
+
+       
             
-            if(CommonHelper.checkIfUserInIdleState(userLastLocation: locations.last!) && !isUserIdleRegionToMonitorCreated){
+//            if(CommonHelper.checkIfUserInIdleState(userLastLocation: locations.last!) && !isUserIdleRegionToMonitorCreated){
+//                self.locationShareModel.bagTaskManager!.beginNewBackgroundTask()
+//                CommonHelper.writeToFile("User is idle, creating dynamic region to monitor ")
+//                createDynamicRegionToMonitor()
+//                isUserIdleRegionToMonitorCreated = true
+//                return
+//            }
+            
+            if(CommonHelper.checkIfuserInIdleState(backgroundUserLocations: self.tempLocations) && !isUserIdleRegionToMonitorCreated){
                 self.locationShareModel.bagTaskManager!.beginNewBackgroundTask()
                 CommonHelper.writeToFile("User is idle, creating dynamic region to monitor ")
                 createDynamicRegionToMonitor()
                 isUserIdleRegionToMonitorCreated = true
                 return
             }
+
+            
 
             
             if locationShareModel.backgroundTimer != nil{

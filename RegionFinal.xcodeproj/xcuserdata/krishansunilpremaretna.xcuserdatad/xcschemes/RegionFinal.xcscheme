@@ -89,7 +89,7 @@
          </AdditionalOption>
       </AdditionalOptions>
       <LocationScenarioReference
-         identifier = "../../RegionFinal/SamsungHub.gpx"
+         identifier = "../RegionFinal/SamsungHub.gpx"
          referenceType = "0">
       </LocationScenarioReference>
    </LaunchAction>

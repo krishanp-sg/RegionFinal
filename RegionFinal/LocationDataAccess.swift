@@ -35,17 +35,17 @@ class LocationDataAccess: NSObject {
     }
 
     
-    static func insertLocationToDataBase( userLocation : CLLocation) {
+    static func insertLocationToDataBase( userLocation : CLLocation) -> Bool {
         
         guard applicaitonDelegate != nil else {
-            return
+            return false
         }
         
         if let lastInsertedLocation = getLastInsertedUserLocation() {
             
             if (lastInsertedLocation.isEqualToCoreLocation(userLocation)) {
                 
-                return
+                return false
             }
             
         }
@@ -61,14 +61,16 @@ class LocationDataAccess: NSObject {
             location.setValue( userLocation.coordinate.latitude , forKey: "latitude")
             location.setValue( userLocation.coordinate.longitude , forKey: "longitude")
             //        location.setValue( Int(userLocation.horizontalAccuracy), forKey: "accuracy")
-            location.setValue(userLocation.timestamp, forKey: "timestamp")
-            location.setValue(CommonHelper.convertDateToString(dateToConvert: userLocation.timestamp), forKey: "humanreadable")
+            location.setValue(Date(), forKey: "timestamp")
+            location.setValue(CommonHelper.convertDateToString(dateToConvert: Date()), forKey: "humanreadable")
             
             do {
                 try getMainContext().save()
                 CommonHelper.writeToFile("Location Inserted coordinates : \(userLocation.coordinate.latitude),\(userLocation.coordinate.longitude) ")
+                return true
             } catch let error as NSError {
                 print("Could Not Save. \(error) , \(error.localizedDescription)")
+                return false
             }
             
 //        }
@@ -98,6 +100,54 @@ class LocationDataAccess: NSObject {
         }
         
         return nil
+    }
+    
+    static func getRecentLocations(recentLocationCount : Int) -> [Location] {
+        guard applicaitonDelegate != nil else {
+            return [Location]()
+        }
+
+        let fetchRequest : NSFetchRequest<Location> = Location.fetchRequest()
+        fetchRequest.sortDescriptors = [ NSSortDescriptor.init(key: "timestamp", ascending: false) ]
+        fetchRequest.fetchLimit = recentLocationCount
+        
+        
+        do {
+            let result = try getContext().fetch(fetchRequest)
+            return result
+        } catch let error as NSError {
+            print("Could Not Fetch any Object . \(error) \(error.localizedDescription)")
+            
+        }
+        
+        return [Location]()
+
+    }
+    
+    static func getRecentLocations(timeInMinutes : Int) -> [Location] {
+        
+        guard applicaitonDelegate != nil else {
+            return [Location]()
+        }
+        
+        let fetchRequest : NSFetchRequest<Location> = Location.fetchRequest()
+        fetchRequest.sortDescriptors = [ NSSortDescriptor.init(key: "timestamp", ascending: false) ]
+        
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: .minute, value: -timeInMinutes, to: Date())
+        let predicate = NSPredicate(format: "timestamp > %@", date! as NSDate)
+        fetchRequest.predicate = predicate
+        
+        
+        do {
+            let result = try getContext().fetch(fetchRequest)
+            return result
+        } catch let error as NSError {
+            print("Could Not Fetch any Object . \(error) \(error.localizedDescription)")
+            
+        }
+        
+        return [Location]()
     }
     
     static func retriveUserLocation(_ retrivedHandler:@escaping UserLocationRetrivedhandler)  {

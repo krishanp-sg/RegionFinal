@@ -39,18 +39,98 @@ class CommonHelper: NSObject {
 
     }
     
-    
-    static func checkIfUserInIdleState(userLastLocation : CLLocation) -> Bool{
-               
-        if let lastInsertedLocation = LocationDataAccess.getLastInsertedUserLocation() {
+    static func checkIfuserInIdleState(backgroundUserLocations : [LocationManagerNew.TemperaryLocation])-> Bool {
+        
+        if backgroundUserLocations.count == 0 {
+            return true
+        }
+        
+//        if Date().timeIntervalSince(backgroundUserLocations.first!.date) < 3*60 {
+//            return false
+//        }
+        
+        var idlePoints = 0
+        
+        for i in 0..<backgroundUserLocations.count {
+            var ava_lat = 0.0
+            var ava_long = 0.0
+            var size = 0.0
             
-            if (lastInsertedLocation.isIdleUserLocation(userLastLocation)) {
-                
-                return true
+            for j in 0...i {
+                let tempLocation = backgroundUserLocations[j].location
+                ava_lat += tempLocation!.coordinate.latitude
+                ava_long += tempLocation!.coordinate.longitude
+                size += 1
+            }
+            
+            let averageLocation = CLLocation(latitude: ava_lat/size, longitude: ava_long/size)
+            let distance = backgroundUserLocations.last!.location.distance(from: averageLocation)
+            
+            if distance < 200 {
+                idlePoints += 1
             }
         }
-
-        return false
+        
+        
+        let idelPercentage = (Double(idlePoints) / Double(backgroundUserLocations.count)) * 100
+        
+        if idelPercentage < 75 {
+            return false
+        }
+        
+        
+        return true
+    }
+    
+    static func checkIfUserInIdleState(userLastLocation : CLLocation) -> Bool{
+        
+        let last5minUserlocations = LocationDataAccess.getRecentLocations(timeInMinutes: 5)
+        
+        if last5minUserlocations.count == 0 {
+            return true
+        }
+        
+        var idlePoints = 0
+        let lastLocation = CLLocation(latitude: userLastLocation.coordinate.latitude, longitude: userLastLocation.coordinate.longitude)
+        for  i in 0..<last5minUserlocations.count {
+            var ava_lat = 0.0
+            var ava_long = 0.0
+            var size = 0.0
+           
+            for j in 0...i{
+                let tempLocation = last5minUserlocations[j]
+                ava_lat += tempLocation.latitude
+                ava_long += tempLocation.longitude
+                size += 1
+            }
+            
+            let averageLocaton = CLLocation(latitude: (ava_lat/size), longitude: (ava_long/size))
+            
+            let distance = lastLocation.distance(from: averageLocaton)
+            
+            if distance < 100 && distance != 0 {
+                idlePoints += 1
+            }
+        }
+        
+        
+        let idlePercentage = (idlePoints/last5minUserlocations.count)*100
+        
+        if idlePercentage < 75 {
+            return false
+        }
+        
+        return true
+               
+//        if let lastInsertedLocation = LocationDataAccess.getLastInsertedUserLocation() {
+//            
+//            if (lastInsertedLocation.isIdleUserLocation(userLastLocation)) {
+//                
+//                return true
+//            }
+//        }
+//
+//        return false
     }
     
     static func getCurrentDate() -> Date {
